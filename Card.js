@@ -10,6 +10,32 @@ window.BaseCard = function (obj) {
 	this.envHealthChange = (obj.envHealthChange) ? obj.envHealthChange : 0;
 };
 
+window.SingleLinkCard = function (obj) {
+	this._super.call(this, obj);
+	this.linkText = obj.linkText;
+  this.nextLink = obj.nextLink;
+
+	this.toHarloweString = function () {
+		return `
+			Cash: $cash billions
+			Cash Flow: $income billions
+			Environmental Health: $envHealth%
+
+			${this.description}
+
+			[${this.linkText}]<1|
+			(click: ?1)[(goto: "${this.nextLink}")]
+		`;
+	};
+};
+
+// SingleLinkCard will inherit from a new object which inherits from the parent
+// set the constructor property back to the SingleLinkCard constructor function
+// set the "_super" to the BaseCard constructor function
+SingleLinkCard.prototype = Object.create(BaseCard.prototype);
+SingleLinkCard.prototype.constructor = SingleLinkCard;
+SingleLinkCard.prototype._super = BaseCard;
+
 window.YesNoCard = function (obj) {
   // the "new" operator sets the reference of "this" to
   // a new object, the new object is then passed to the
@@ -21,19 +47,19 @@ window.YesNoCard = function (obj) {
 
 	this.toHarloweString = function () {
 		return `
-		Cash: $cash billions
-		Cash Flow: $income billions
-		Environmental Health: $envHealth%
+			Cash: $cash billions
+			Cash Flow: $income billions
+			Environmental Health: $envHealth%
 
-		${this.description}
+			${this.description}
 
-		[Yes]<1|
-		[No]<2|
-		(click: ?1)[(set: $cash to $cash + ${this.cashChange} + $income)(set: $income to $income + ${this.incomeChange})(set: $envHealth to $envHealth + ${this.envHealthChange})(set: $history to $history + (a: $passage))(goto: "${this.nextLinkForYes}")]
-		(click: ?2)[(set: $cash to $cash + $income)(goto: "${this.nextLinkForNo}")]
+			[Yes]<1|
+			[No]<2|
+			(click: ?1)[(set: $cash to $cash + ${this.cashChange} + $income)(set: $income to $income + ${this.incomeChange})(set: $envHealth to $envHealth + ${this.envHealthChange})(set: $history to $history + (a: $passage))(goto: "${this.nextLinkForYes}")]
+			(click: ?2)[(set: $cash to $cash + $income)(goto: "${this.nextLinkForNo}")]
 		`;
 	};
-}
+};
 
 // YesNoCard will inherit from a new object which inherits from the parent
 // set the constructor property back to the YesNoCard constructor function
