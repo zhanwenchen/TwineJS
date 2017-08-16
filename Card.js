@@ -1,21 +1,43 @@
-window.Card = function (obj) {
+window.BaseCard = function (obj) {
+
+	if (this.constructor === BaseCard) {
+      throw new Error("Can't instantiate abstract class!");
+  }
 
 	this.description = obj.description;
-	this.nextLinkForYes = obj.nextLinkForYes;
-	this.nextLinkForNo = obj.nextLinkForNo;
 	this.cashChange = (obj.cashChange) ? obj.cashChange : 0;
 	this.incomeChange = (obj.incomeChange) ? obj.incomeChange : 0;
 	this.envHealthChange = (obj.envHealthChange) ? obj.envHealthChange : 0;
+};
+
+window.YesNoCard = function (obj) {
+  // the "new" operator sets the reference of "this" to
+  // a new object, the new object is then passed to the
+  // Person constructor function through the use of call,
+  // so the first name and last name properties can be set
+  this._super.call(this, obj);
+  this.nextLinkForYes = obj.nextLinkForYes;
+	this.nextLinkForNo = obj.nextLinkForNo;
 
 	this.toHarloweString = function () {
 		return `
-Cash: $cash billions
-Cash Flow: $income billions
-Environmental Health: $envHealth%
+		Cash: $cash billions
+		Cash Flow: $income billions
+		Environmental Health: $envHealth%
 
-${this.description}
-(link-goto:"Yes", "${this.nextLinkForYes}[(set: $cash to $cash + ${this.cashChange})(set: $income to $income + ${this.incomeChange})(set: $envHealth to $envHealth + ${this.envHealthChange})]")
-(link-goto:"No", "${this.nextLinkForNo}")
-`;
+		${this.description}
+
+		[Yes]<1|
+		[No]<2|
+		(click: ?1)[(set: $cash to $cash + ${this.cashChange} + $income)(set: $income to $income + ${this.incomeChange})(set: $envHealth to $envHealth + ${this.envHealthChange})(set: $history to $history + (a: $passage))(goto: "${this.nextLinkForYes}")]
+		(click: ?2)[(set: $cash to $cash + $income)(goto: "${this.nextLinkForNo}")]
+		`;
 	};
 }
+
+// YesNoCard will inherit from a new object which inherits from the parent
+// set the constructor property back to the YesNoCard constructor function
+// set the "_super" to the BaseCard constructor function
+YesNoCard.prototype = Object.create(BaseCard.prototype);
+YesNoCard.prototype.constructor = YesNoCard;
+YesNoCard.prototype._super = BaseCard;
